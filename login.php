@@ -16,7 +16,7 @@ if ($user==NULL or $user['id']==NULL)
 		<fieldset data-uk-margin>
 			<legend>Log in</legend>
 			<input name="username" type="text" placeholder="username">
-			<input name="password" type="text" placeholder="password">
+			<input name="password" type="password" placeholder="password">
 			<button class="uk-button">Go!</button>
 		</fieldset>
 	</form>';

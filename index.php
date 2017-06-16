@@ -9,6 +9,9 @@
 </script>
 </head>
 <body>
-<?php show_menu($user); ?>
+<?php
+	show_menu($user); 
+	wall();
+?>
 </body>
 </html>

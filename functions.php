@@ -1,21 +1,28 @@
 <?PHP
 //pozmieniać później wszystkie wystąpienia predis\func na oryginalne
-// require "predis/autoload.php";
-// Predis\Autoloader::register();
+require "predis/autoload.php";
+Predis\Autoloader::register();
 function session_check()
 {
-        if(!isset($_COOKIE['MYSID'])) {
-                $token=md5(rand(0,1000000000));
-                setcookie('MYSID', $token);
-                $user=array('id'=>NULL,'username'=>"Visitor");
-                redis_set_json($token, $user,0);
-        }
-        else
-                $token=$_COOKIE['MYSID'];
-        if (isset($_POST['username']) and isset($_POST['password']))
-                return authorize($_POST['username'],$_POST['password'],$token);
-        else
-                return authorize(NULL,NULL,$token);
+	if(!isset($_COOKIE['MYSID'])) 
+	{
+		$token=md5(rand(0,1000000000));
+		setcookie('MYSID', $token);
+		$user=array('id'=>NULL,'username'=>"Visitor");
+		redis_set_json($token, $user,0);
+	}
+	else
+	{
+		$token=$_COOKIE['MYSID'];
+	}
+	if (isset($_POST['username']) and isset($_POST['password']))
+	{
+		return authorize($_POST['username'],$_POST['password'],$token);
+	}
+	else
+	{
+		return authorize(NULL,NULL,$token);
+	}
 }
 function register()
 {
@@ -98,65 +105,89 @@ function authorize($username,$password, $token)
 {
         if ($username!=NULL and $password!=NULL)
         {
+			// echo $username."<br>";
+			// echo $password."<br>";
 			$host = "localhost";
-			$username = "user";
-			$password = "qwerty";
+			$usern = "user";
+			$pass = "qwerty";
 			$dbname = "rso";
-			$conn = new mysqli($host, $username, $password, $dbname);
+			$conn = new mysqli($host, $usern, $pass, $dbname);
 			$sql = "SELECT * FROM users WHERE username = '".$username."' AND password = '".$password."'";
+			// echo $sql."<br>";
 			$rows_count = $conn->query($sql);
-			echo mysqli_num_rows($rows_count);
+			$id_res = $conn->query("SELECT id FROM users WHERE username = '".$username."' AND password = '".$password."'");
+			// var_dump($id_res);
+			// echo mysqli_num_rows($rows_count);
             if (mysqli_num_rows($rows_count) == 1)
-                $user=array('id'=>uniqid(),'username'=>$username);
+                $user=array('id'=>$id_res,'username'=>$username);
 			else if(mysqli_num_rows($rows_count) > 1)
 				echo 'Database error: TOO MUCH DATA';
             else
+			{
 				$user=array('id'=>NULL,'username'=>"Visitor");
-                //redis_set_json($token,$user,"0");
+			}
+			redis_set_json($token,$user,"0");
             return $user;
         }
-        // else
-            //return redis_get_json($token);
+        else
+            return redis_get_json($token);
 }
 function logout($user)
 {
-        $token=$_COOKIE['MYSID'];
-        $user=array('id'=>NULL,'username'=>"Visitor");
-        redis_set_json($token,$user,"0");
-        return $user;
+	$token=$_COOKIE['MYSID'];
+	$user=array('id'=>NULL,'username'=>"Visitor");
+	redis_set_json($token,$user,"0");
+	return $user;
 }
 function redis_set_json($key, $val, $expire)
 {
-        // $redisClient = new Redis();
-		// // $redisClient = new Predis\Client();
-        // $redisClient->connect( '127.0.0.1', 6379 );
-        // $value=json_encode($val);
-        // if ($expire > 0)
-                // $redisClient->setex($key, $expire, $value );
-        // else
-                // $redisClient->set($key, $value);
-        // $redisClient->close();
+	// $redisClient = new Redis();
+	$redisClient = new Predis\Client();
+	// $redisClient->connect( '127.0.0.1', 6379 );
+	$value=json_encode($val);
+	if ($expire > 0)
+			$redisClient->setex($key, $expire, $value );
+	else
+			$redisClient->set($key, $value);
+	// $redisClient->close();
 }
 function redis_get_json($key)
 {
-        // $redisClient = new Redis();
-		// // $redisClient = new Predis\Client();
-        // $redisClient->connect( '127.0.0.1', 6379 );
-        // $ret=json_decode($redisClient->get($key),true);
-        // $redisClient->close();
-        // return $ret;
+	// $redisClient = new Redis();
+	$redisClient = new Predis\Client();
+	// $redisClient->connect( '127.0.0.1', 6379 );
+	$ret=json_decode($redisClient->get($key),true);
+	// $redisClient->close();
+	return $ret;
 }
 function show_menu($user)
 {
 echo '
 <nav class="uk-navbar">
     <ul class="uk-navbar-nav">';
-                if ($user==NULL or $user['id']==NULL)
-                        echo '<li class="uk-active"><a href="login.php">Login</a></li>';
-                else
-                        echo '<li class="uk-active"><a href="logout.php">Logout</a></li>';
-echo '        <li class="uk-parent"><a href="index.php">Home</a></li>
+	if ($user==NULL or $user['id']==NULL)
+		echo '<li class="uk-active"><a href="login.php">Login</a></li>';
+	else
+		echo '<li class="uk-active"><a href="logout.php">Logout</a></li>';
+	echo '<li class="uk-parent"><a href="index.php">Home</a></li>
     </ul>
 </nav>';
+}
+function wall()
+{
+	echo '<form method="post" action="add_post.php">
+			<fieldset data-uk-margin>
+				<input type="text" maxlength="256"><br>
+				<input type="submit" name="submit" value="Post">
+			</fieldset>
+		</form>';
+		
+	echo '<div name="postview">
+			
+		</div>'
+}
+function get_posts()
+{
+	
 }
 ?>

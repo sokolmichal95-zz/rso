@@ -1,6 +1,6 @@
 <?php
 	require_once('functions.php');
-	/* $user=session_check(); */
+	$user=session_check();
 ?>
 <html>
 <head>
