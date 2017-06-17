@@ -11,7 +11,8 @@
 <body>
 <?php
 	show_menu($user); 
-	wall();
+	add_post($user);
+	get_posts($user);
 ?>
 </body>
 </html>

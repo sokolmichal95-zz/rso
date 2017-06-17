@@ -1,5 +1,4 @@
 <?PHP
-//pozmieniać później wszystkie wystąpienia predis\func na oryginalne
 require "predis/autoload.php";
 Predis\Autoloader::register();
 function session_check()
@@ -173,21 +172,45 @@ echo '
     </ul>
 </nav>';
 }
-function wall()
+function add_post($user)
 {
+	if ($user==NULL or $user['id']==NULL)
+		echo '<h3>Zaloguj sie, aby dodawac i przegladac posty</h3>';
+	else
+	{
 	echo '<form method="post" action="add_post.php">
 			<fieldset data-uk-margin>
 				<input type="text" maxlength="256"><br>
 				<input type="submit" name="submit" value="Post">
 			</fieldset>
 		</form>';
-		
-	echo '<div name="postview">
-			
-		</div>'
+	}
 }
-function get_posts()
+function get_posts($user)
 {
+	if(!($user==NULL or $user['id']==NULL))
+	{
+		$host = "localhost";
+		$usern = "user";
+		$pass = "qwerty";
+		$dbname = "rso";
+		$conn = new mysqli($host, $usern, $pass, $dbname);
+		$sql = 'SELECT * FROM posts p JOIN users u ON p.author = u.id ORDER BY p.id DESC LIMIT 10';
+		$result = $conn->query($sql);
+	
+		if(mysqli_num_rows($result) > 0)
+		{
+			while($row = $result->fetch_assoc())
+			{
+			
+				echo '<div name="postview">
+					<div name="author">'.$row["firstname"]." ".$row["lastname"].'</div>
+					<div name="posttext">'.$row["text"].'</div>
+				</div><br>';
+			}
+		}
+		$conn->close();
+	}
 	
 }
 ?>
