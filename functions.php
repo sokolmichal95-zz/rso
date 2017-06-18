@@ -115,10 +115,11 @@ function authorize($username,$password, $token)
 			// echo $sql."<br>";
 			$rows_count = $conn->query($sql);
 			$id_res = $conn->query("SELECT id FROM users WHERE username = '".$username."' AND password = '".$password."'");
-			// var_dump($id_res);
+			$row = mysqli_fetch_row($id_res);
+			//var_dump($row);
 			// echo mysqli_num_rows($rows_count);
             if (mysqli_num_rows($rows_count) == 1)
-                $user=array('id'=>$id_res,'username'=>$username);
+                $user=array('id'=>$row[0],'username'=>$username);
 			else if(mysqli_num_rows($rows_count) > 1)
 				echo 'Database error: TOO MUCH DATA';
             else
@@ -178,12 +179,15 @@ function add_post($user)
 		echo '<h3>Zaloguj sie, aby dodawac i przegladac posty</h3>';
 	else
 	{
-	echo '<form method="post" action="add_post.php">
+		//var_dump($user['id']);
+		//echo $user['id'];
+		echo '<form method="post" action="add_post.php">
 			<fieldset data-uk-margin>
-				<input type="text" maxlength="256"><br>
+				<input name="text" type="text" maxlength="256"><br>
+				<input name="author" type="hidden" value='.$user['id'].'>
 				<input type="submit" name="submit" value="Post">
 			</fieldset>
-		</form>';
+			</form>';
 	}
 }
 function get_posts($user)

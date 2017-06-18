@@ -10,6 +10,7 @@
 </head>
 <body>
 <?php
+	//var_dump($user);
 	show_menu($user); 
 	add_post($user);
 	get_posts($user);
