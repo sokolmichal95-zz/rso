@@ -37,14 +37,16 @@ function register()
 	echo "Connected Succesfully<br/>";
 	$sql = "SELECT * FROM users WHERE username = '".$_POST['username']."'";
 	$rows_count = $conn->query($sql);
-	if(mysqli_num_rows($rows_count) == 0){
+	if(mysqli_num_rows($rows_count) == 0)
+	{
 		$target_dir = "uploads/";
 		$target_file = $target_dir . basename($_FILES["avatar"]["name"]);
 		$uploadOk = 1;
 		$imageFileType = pathinfo($target_file,PATHINFO_EXTENSION);
 		$ready_to_upload_file = $target_dir.$_POST['username'].".".$imageFileType;
 		// Check if image file is a actual image or fake image
-		if(isset($_POST["submit"])) {
+		if(isset($_POST["submit"]))
+	       	{
 			$check = getimagesize($_FILES["avatar"]["tmp_name"]);
 			if($check !== false) {
 				echo "File is an image - " . $check["mime"] . ".";
@@ -55,29 +57,60 @@ function register()
 			}
 		}
 		// Check if file already exists
-		if (file_exists($ready_to_upload_file)) {
+		if (file_exists($ready_to_upload_file)) 
+		{
 			echo "Sorry, file already exists.";
 			$uploadOk = 0;
 		}
 		// Check file size
-		if ($_FILES["avatar"]["size"] > 500000) {
+		if ($_FILES["avatar"]["size"] > 500000) 
+		{
 			echo "Sorry, your file is too large.";
 			$uploadOk = 0;
 		}
 		// Allow certain file formats
 		if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-		&& $imageFileType != "gif" ) {
+			&& $imageFileType != "gif" ) 
+		{
 			echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
 			$uploadOk = 0;
 		}
 		// Check if $uploadOk is set to 0 by an error
-		if ($uploadOk == 0) {
+		if ($uploadOk == 0) 
+		{
 			echo "Sorry, your file was not uploaded.";
 		// if everything is ok, try to upload file
-		} else {
-			if (move_uploaded_file($_FILES["avatar"]["tmp_name"], $ready_to_upload_file)) {
+		} 
+		else 
+		{
+			$maxDimW = 100;
+			$maxDimH = 100;
+			list($width, $height, $type, $attr) = getimagesize( $_FILES['avatar']['tmp_name'] );
+			if ( $width > $maxDimW || $height > $maxDimH ) 
+			{
+			    $fn = $_FILES['avatar']['tmp_name'];
+			    $size = getimagesize( $ready_to_upload_file );
+			    $ratio = $size[0]/$size[1]; // width/height
+			    if( $ratio > 1) 
+			    {
+			        $width = $maxDimW;
+			        $height = $maxDimH/$ratio;
+			    } 
+			    else 
+			    {
+			        $width = $maxDimW*$ratio;
+			        $height = $maxDimH;
+			    }
+			}
+			$src = imagecreatefromstring(file_get_contents($fn));
+		    	$dst = imagecreatetruecolor( $width, $height );
+    			imagecopyresampled($dst, $src, 0, 0, 0, 0, $width, $height, $size[0], $size[1] );
+			if (move_uploaded_file($_FILES["avatar"]["tmp_name"], $ready_to_upload_file)) 
+			{
 				echo "The file ". basename( $_FILES["avatar"]["name"]). " has been uploaded.";
-			} else {
+			} 
+			else 
+			{
 				echo "Sorry, there was an error uploading your file.";
 			}
 		}
@@ -166,7 +199,10 @@ echo '
 <nav class="uk-navbar">
     <ul class="uk-navbar-nav">';
 	if ($user==NULL or $user['id']==NULL)
+	{
 		echo '<li class="uk-active"><a href="login.php">Login</a></li>';
+		echo '<li class="uk-active"><a href="registration.php">Register</a></li>';
+	}
 	else
 		echo '<li class="uk-active"><a href="logout.php">Logout</a></li>';
 	echo '<li class="uk-parent"><a href="index.php">Home</a></li>
